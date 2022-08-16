@@ -53,6 +53,7 @@ private:
 	CMenuCheckBox	lookStrafe;
 	CMenuCheckBox	lookFilter;
 	CMenuCheckBox	autoaim;
+	CMenuCheckBox	rawinput;
 	CMenuSlider	sensitivity;
 };
 
@@ -90,6 +91,7 @@ void CAdvancedControls::GetConfig( )
 	lookFilter.LinkCvar( "look_filter" );
 
 	autoaim.LinkCvar( "sv_aim" );
+	rawinput.LinkCvar( "m_rawinput" );
 	sensitivity.LinkCvar( "sensitivity" );
 
 	ToggleLookCheckboxes( false );
@@ -129,6 +131,7 @@ void CAdvancedControls::SaveAndPopMenu()
 	if( EngFuncs::GetCvarString("m_filter")[0] )
 		EngFuncs::CvarSetValue( "m_filter", lookFilter.bChecked );
 	autoaim.WriteCvar();
+	rawinput.WriteCvar();
 	sensitivity.WriteCvar();
 
 	ToggleLookCheckboxes( true );
@@ -181,6 +184,10 @@ void CAdvancedControls::_Init( void )
 	autoaim.iFlags |= QMF_NOTIFY;
 	autoaim.SetCoord( 72, 580 );
 
+	rawinput.SetNameAndStatus( L( "GameUI_RawInput" ), L( "GameUI_RawInputLabel" ) );
+	rawinput.iFlags |= QMF_NOTIFY;
+	rawinput.SetCoord( 72, 610 );
+
 	sensitivity.SetNameAndStatus( L( "GameUI_MouseSensitivity" ), L( "Set in-game mouse sensitivity" ) );
 	sensitivity.Setup( 0.0, 20.0f, 0.1 );
 	sensitivity.SetCoord( 72, 660 );
@@ -204,6 +211,7 @@ void CAdvancedControls::_Init( void )
 	AddItem( lookStrafe );
 	AddItem( lookFilter );
 	AddItem( autoaim );
+	AddItem( rawinput );
 	AddItem( sensitivity );
 }
 

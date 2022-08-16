@@ -67,6 +67,9 @@ convar_t *cl_forwardspeed;
 convar_t *cl_sidespeed;
 convar_t *cl_backspeed;
 convar_t *look_filter;
+convar_t *m_rawinput;
+
+static qboolean m_bRawInput, s_bMouseGrab;
 /*
 =======
 Host_MapKey
@@ -438,6 +441,8 @@ void IN_StartupMouse( void )
 	m_pitch = Cvar_Get( "m_pitch", "0.022", CVAR_ARCHIVE, "mouse pitch value" );
 	m_yaw = Cvar_Get( "m_yaw", "0.022", CVAR_ARCHIVE, "mouse yaw value" );
 	look_filter = Cvar_Get( "look_filter", "0", CVAR_ARCHIVE, "filter look events making it smoother" );
+	m_rawinput = Cvar_Get( "m_rawinput", "1", CVAR_ARCHIVE, "enable mouse raw input" );
+
 	
 	// You can use -nomouse argument to prevent using mouse from client
 	// -noenginemouse will disable all mouse input
@@ -523,6 +528,65 @@ void IN_ToggleClientMouse( int newstate, int oldstate )
 #ifdef USE_EVDEV
 		Evdev_SetGrab( true );
 #endif
+	}
+}
+
+void IN_CheckMouseState( qboolean active )
+{
+#if XASH_WIN32
+	qboolean useRawInput = CVAR_TO_BOOL( m_rawinput ) && clgame.client_dll_uses_sdl || clgame.dllFuncs.pfnLookEvent;
+#else
+	qboolean useRawInput = true; // always use SDL code
+#endif
+
+	if( active && useRawInput && !host.mouse_visible && cls.state == ca_active )
+	{
+		if( !m_bRawInput )
+		{
+#if XASH_SDL == 2
+			SDL_GetRelativeMouseState( NULL, NULL );
+			SDL_SetRelativeMouseMode( SDL_TRUE );
+#endif
+
+			// Con_Printf( "Enable relative mode\n" );
+			m_bRawInput = true;
+		}
+	}
+	else
+	{
+		if( m_bRawInput )
+		{
+#if XASH_SDL == 2
+			SDL_GetRelativeMouseState( NULL, NULL );
+			SDL_SetRelativeMouseMode( SDL_FALSE );
+#endif
+			// Con_Printf( "Disable relative mode\n" );
+			m_bRawInput = false;
+		}
+	}
+
+	if( active && !host.mouse_visible && cls.state == ca_active )
+	{
+		if( !s_bMouseGrab )
+		{
+#if XASH_SDL
+			SDL_SetWindowGrab( host.hWnd, SDL_TRUE );
+#endif
+			// Con_Printf( "Enable grab\n" );
+			s_bMouseGrab = true;
+		}
+	}
+	else
+	{
+		if( s_bMouseGrab )
+		{
+#if XASH_SDL
+			SDL_SetWindowGrab( host.hWnd, SDL_FALSE );
+#endif
+
+			// Con_Printf( "Disable grab\n" );
+			s_bMouseGrab = false;
+		}
 	}
 }
 
@@ -755,6 +819,7 @@ void IN_Init( void )
 	Cmd_AddCommand ("evdev_autodetect", Evdev_Autodetect_f, "Automaticly open mouses and keyboards");
 #endif
 }
+
 
 /*
 ================
