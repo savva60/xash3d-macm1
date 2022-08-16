@@ -1,0 +1,22 @@
+// ============================
+// Hazardous Course Liblist File
+// ============================
+
+gamedir "hc"
+game "Hazardous Course"
+url_info "http://www.richmans-maps.ch.vu/hlmaps/hc2.htm"
+url_dl "http://www.richmans-maps.ch.vu/hlmaps/hc2.htm"
+manual "http://www.richmans-maps.ch.vu/hlmaps/hc2_faq.htm"
+developer "http://www.richmans-maps.ch.vu/"
+developer_url "http://www.richmans-maps.ch.vu/"
+version "1.0"
+size "121180160"
+hlversion "1110"
+type "Single"
+svonly "0"
+cldll "0"
+gamedll "dlls\hl.dll"
+gamedll_linux "dlls/hl_i386.so"
+startmap "hc2a1"
+trainmap "hc2a1"
+icon "hc"
